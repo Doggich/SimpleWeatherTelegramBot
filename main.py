@@ -4,7 +4,7 @@ import datetime
 from dotenv import load_dotenv, find_dotenv
 import pytz
 import requests
-import pprint
+from typing import Dict, Optional
 
 load_dotenv(find_dotenv())
 
@@ -13,17 +13,21 @@ def unix_to_datetime(unix_timestamp: int, timezone: str = 'UTC') -> str:
     return datetime.datetime.fromtimestamp(unix_timestamp, tz=pytz.timezone(timezone))
 
 
-def get_weather(city: str, api_key: str) -> dict:
+def get_weather(city: str, api_key: str) -> Optional[Dict]:
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&lang=ru&appid={api_key}"
     try:
-        weather_data = requests.get(url).json()
-        return weather_data
-    except requests.RequestException as e:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+        return None
+    except Exception as e:
         print(f"An error occurred: {e}")
         return None
 
 
-TOKEN: str = os.getenv("TOKEN")
+TOKEN: str = os.getenv("BOT_TOKEN")
 API_KEY: str = os.getenv("OPENWEATHER_API_KEY")
 
 bot: TeleBot = TeleBot(TOKEN)
