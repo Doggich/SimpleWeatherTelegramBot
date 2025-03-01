@@ -61,17 +61,21 @@ def handle_city_input(msg: types.Message) -> None:
         try:
             if weather_data:
                 main_data = weather_data['main']
+                wind_data = weather_data['wind']
                 weather_description = weather_data['weather'][0]['description'].capitalize()
                 sunrise = unix_to_datetime(weather_data['sys']['sunrise'], 'UTC').strftime("%H:%M:%S")
                 sunset = unix_to_datetime(weather_data['sys']['sunset'], 'UTC').strftime("%H:%M:%S")
-                message = f"Weather in <u>{city.capitalize()}</u>:\n" \
+                message = "--------------------------\n" \
+                          f"Weather in <u>{city.capitalize()}</u>:\n" \
                           f"Temperature: {main_data['temp']}°C\n" \
                           f"Feels like: {main_data['feels_like']}°C\n" \
                           f"Humidity: {main_data['humidity']}%\n" \
                           f"Pressure: {main_data['pressure']} hPa\n" \
                           f"Weather: {weather_description}\n" \
-                          f"Sunrise: {sunrise}\n" \
-                          f"Sunset: {sunset}"
+                          f"Sunrise: {sunrise}\n"\
+                          f"Sunset: {sunset}\n"\
+                          f"Wind speed: {wind_data['speed']:.2f} m/s\n" \
+                          f"--------------------------\n"
                 bot.send_message(msg.chat.id, message,  parse_mode="HTML")
             else:
                 bot.send_message(msg.chat.id, "Could not retrieve weather data. Please check the city name.")
